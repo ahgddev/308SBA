@@ -78,6 +78,33 @@ const CourseInfo = {
   
   function getLearnerData(course, ag, submissions) {
     // here, we would process this data to achieve the desired result.
+
+    // // the ID of the learner for which this data has been collected
+    // "id": number,
+    // // the learner’s total, weighted average, in which assignments
+    // // with more points_possible should be counted for more
+    // // e.g. a learner with 50/100 on one assignment and 190/200 on another
+    // // would have a weighted average score of 240/300 = 80%.
+    // "avg": number,
+    // // each assignment should have a key with its ID,
+    // // and the value associated with it should be the percentage that
+    // // the learner scored on the assignment (submission.score / points_possible)
+    // <assignment_id>: number,
+    // // if an assignment is not yet due, it should not be included in either
+    // // the average or the keyed dictionary of scores
+    // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
+
+    //Check the assignmentgroup is within the course by 
+    // - Compare the AssignmentGroup obj "name" to the inputted CourseInfo "id"
+    //Throw an error if this is not the case, otherwise, continue
+    // Get the student ID
+    // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
+    // Filter out assignments not due yet
+    // Deduct 10 points from all asignments turned in late; compare AssignmentInfo "due_at" to LearnerSubmission "submitted_at"
+    // Calculate the avg, trawl through the assignments and grab their grades + total points
+    // Calculate the percentage total of each assignment, by their ID.
+    // Wrap all of this up in an object.
+
     const result = [
       {
         id: 125,
@@ -97,4 +124,8 @@ const CourseInfo = {
   }
   
   const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
-  console.log(result);  
+  console.log(result); 
+  
+  function getLearnerID(){
+    
+  }
