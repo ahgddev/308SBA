@@ -75,9 +75,34 @@ const CourseInfo = {
       }
     }
   ];
+
+  function checkAssignmentCourseInfo(courseInformation, assignmentGroupInformation){
+    if (assignmentGroupInformation.course_id !== courseInformation.id){
+        return false
+    } else {
+        return true
+    }
+  }
   
+  function collectLearnerSubmissions(assignmentGroupInformation, submissions){
+    
+  }
   function getLearnerData(course, ag, submissions) {
-    // here, we would process this data to achieve the desired result.
+    
+    try{
+        if(!checkAssignmentCourseInfo(course, ag)){
+           throw "Assignment Group does not match Course." 
+        } else if(course == undefined || course == null) {
+            throw "Course does not exist."
+        } else if (ag == undefined || ag == null) {
+            throw "Assignment Group does not exist."
+        }
+        else {
+            console.log("Course & assignment information found.")
+        }
+    } catch (error) {
+        console.log("Error: " + error)
+    }
 
     // // the ID of the learner for which this data has been collected
     // "id": number,
@@ -94,9 +119,7 @@ const CourseInfo = {
     // // the average or the keyed dictionary of scores
     // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
 
-    //Check the assignmentgroup is within the course by 
-    // - Compare the AssignmentGroup obj "name" to the inputted CourseInfo "id"
-    //Throw an error if this is not the case, otherwise, continue
+  
     // Get the student ID
     // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
     // Filter out assignments not due yet
@@ -104,6 +127,8 @@ const CourseInfo = {
     // Calculate the avg, trawl through the assignments and grab their grades + total points
     // Calculate the percentage total of each assignment, by their ID.
     // Wrap all of this up in an object.
+    // Final object does not need to match the order of the example
+    // Okay to use round() or something to clean up decimals
 
     const result = [
       {
@@ -126,6 +151,3 @@ const CourseInfo = {
   const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
   console.log(result); 
   
-  function getLearnerID(){
-    
-  }
