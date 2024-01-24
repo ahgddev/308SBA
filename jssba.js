@@ -84,19 +84,19 @@ const CourseInfo = {
     }
   }
 
-  function checkDueDate(submissionDate, dueDate){
+  function wasSubmittedLate(submissionDate, dueDate){
     let convertedsubDate = Date.parse(submissionDate)
     let convertedDueDate = Date.parse(dueDate)
 
-    if (convertedDueDate < convertedsubDate) {
-        return true
-    } else {
+    if (convertedDueDate > convertedsubDate || convertedDueDate === convertedsubDate) {
         return false
+    } else {
+        return true
     }
   }
   
   function collectLearnerSubmissions(agInformation, agsubmissions){
-     // Get the student ID
+    // Get the student ID
     // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
     let learnerUpdatedData = []
     for (assignmentObj of agInformation.assignments) {
@@ -105,10 +105,10 @@ const CourseInfo = {
                 if(learnerInfo.assignment_id == assignmentID) {
                     learnerUpdatedData.unshift(
                         {
-                            learner_id: learnerInfo.id,
+                            learner_id: learnerInfo.learner_id,
                             assignment_id: assignmentID,
                             submission: {
-                                was_submited_late: checkDueDate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
+                                was_submited_late: wasSubmittedLate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
                                 final_score: [learnerInfo.submission.score,assignmentObj.points_possible]
                             }
                         }
@@ -116,7 +116,6 @@ const CourseInfo = {
                 }
             }
         }
-    console.log(learnerUpdatedData)
     return learnerUpdatedData
   }
 
@@ -155,8 +154,6 @@ const CourseInfo = {
     // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
 
   
-    // Get the student ID
-    // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
     // Filter out assignments not due yet
     // Deduct 10 points from all asignments turned in late; compare AssignmentInfo "due_at" to LearnerSubmission "submitted_at"
     // Calculate the avg, trawl through the assignments and grab their grades + total points
