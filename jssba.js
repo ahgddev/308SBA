@@ -87,12 +87,13 @@ const CourseInfo = {
   function wasSubmittedLate(submissionDate, dueDate){
     let convertedsubDate = Date.parse(submissionDate)
     let convertedDueDate = Date.parse(dueDate)
+    let today =  new Date()
 
-    if (convertedDueDate > convertedsubDate) {
+    if (convertedDueDate > today) {
         return "Not due yet."
-    } else if (convertedDueDate === convertedsubDate){
+    } else if (convertedsubDate === convertedDueDate || convertedsubDate < convertedDueDate){
         return false
-    } else {
+    } else if (convertedsubDate > convertedDueDate){
         return true
     }
   }
