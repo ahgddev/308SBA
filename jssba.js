@@ -85,8 +85,10 @@ const CourseInfo = {
   }
   
   function collectLearnerSubmissions(assignmentGroupInformation, submissions){
-    
+     // Get the student ID
+    // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
   }
+
   function getLearnerData(course, ag, submissions) {
     
     try{
