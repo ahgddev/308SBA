@@ -88,7 +88,9 @@ const CourseInfo = {
     let convertedsubDate = Date.parse(submissionDate)
     let convertedDueDate = Date.parse(dueDate)
 
-    if (convertedDueDate > convertedsubDate || convertedDueDate === convertedsubDate) {
+    if (convertedDueDate > convertedsubDate) {
+        return "Not due yet."
+    } else if (convertedDueDate === convertedsubDate){
         return false
     } else {
         return true
@@ -116,6 +118,7 @@ const CourseInfo = {
                 }
             }
         }
+        console.log(learnerUpdatedData)
     return learnerUpdatedData
   }
 
