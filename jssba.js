@@ -85,6 +85,7 @@ const CourseInfo = {
   }
 
   function wasSubmittedLate(submissionDate, dueDate){
+    // Filter out assignments not due yet
     let convertedsubDate = Date.parse(submissionDate)
     let convertedDueDate = Date.parse(dueDate)
     let today =  new Date()
@@ -124,7 +125,7 @@ const CourseInfo = {
   }
 
   function getLearnerData(course, ag, submissions) {
-    
+        // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
     try{
         if(!checkAssignmentCourseInfo(course, ag)){
            throw "Assignment Group does not match Course." 
@@ -155,10 +156,10 @@ const CourseInfo = {
     // <assignment_id>: number,
     // // if an assignment is not yet due, it should not be included in either
     // // the average or the keyed dictionary of scores
-    // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
+
 
   
-    // Filter out assignments not due yet
+
     // Deduct 10 points from all asignments turned in late; compare AssignmentInfo "due_at" to LearnerSubmission "submitted_at"
     // Calculate the avg, trawl through the assignments and grab their grades + total points
     // Calculate the percentage total of each assignment, by their ID.
