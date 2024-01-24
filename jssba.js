@@ -76,17 +76,48 @@ const CourseInfo = {
     }
   ];
 
-  function checkAssignmentCourseInfo(courseInformation, assignmentGroupInformation){
-    if (assignmentGroupInformation.course_id !== courseInformation.id){
+  function checkAssignmentCourseInfo(courseInformation, agInformation){
+    if (agInformation.course_id !== courseInformation.id){
         return false
     } else {
         return true
     }
   }
+
+  function checkDueDate(submissionDate, dueDate){
+    let convertedsubDate = Date.parse(submissionDate)
+    let convertedDueDate = Date.parse(dueDate)
+
+    if (convertedDueDate < convertedsubDate) {
+        return true
+    } else {
+        return false
+    }
+  }
   
-  function collectLearnerSubmissions(assignmentGroupInformation, submissions){
+  function collectLearnerSubmissions(agInformation, agsubmissions){
      // Get the student ID
     // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
+    let learnerUpdatedData = []
+    for (assignmentObj of agInformation.assignments) {
+        let assignmentID = assignmentObj.id
+            for (learnerInfo of agsubmissions) {
+                if(learnerInfo.assignment_id == assignmentID) {
+                    learnerUpdatedData.unshift(
+                        {
+                            learner_id: learnerInfo.id,
+                            assignment_id: assignmentID,
+                            submission: {
+                                was_submited_late: checkDueDate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
+                                final_score: [learnerInfo.submission.score,assignmentObj.points_possible]
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    console.log(learnerUpdatedData)
+    return learnerUpdatedData
   }
 
   function getLearnerData(course, ag, submissions) {
@@ -105,6 +136,8 @@ const CourseInfo = {
     } catch (error) {
         console.log("Error: " + error)
     }
+
+    collectLearnerSubmissions(ag,submissions)
 
     // // the ID of the learner for which this data has been collected
     // "id": number,
