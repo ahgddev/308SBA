@@ -1,4 +1,5 @@
-**SBA 308 - Javascript Fundamentals
+#SBA 308 - Javascript Fundamentals
+
 ## Introduction
 This project reflects my understanding of basic Javascript principles such as variables, loops, etc.
 
