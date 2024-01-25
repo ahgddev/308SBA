@@ -77,6 +77,7 @@ const CourseInfo = {
   ];
 
   function checkAssignmentCourseInfo(courseInformation, agInformation){
+    //Make sure the course information and the assignment group information match
     if (agInformation.course_id !== courseInformation.id){
         return false
     } else {
@@ -85,7 +86,7 @@ const CourseInfo = {
   }
 
   function wasSubmittedLate(submissionDate, dueDate){
-    // Filter out assignments not due yet
+    // Helper function filters assignments not due yet
     let convertedsubDate = Date.parse(submissionDate)
     let convertedDueDate = Date.parse(dueDate)
     let today =  new Date()
@@ -102,27 +103,95 @@ const CourseInfo = {
   function collectLearnerSubmissions(agInformation, agsubmissions){
     // Get the student ID
     // Get all assignments done by the student matching the LearnerSubmission "assignment_id" to the AssignmentGroup "name"
+
     let learnerUpdatedData = []
     for (assignmentObj of agInformation.assignments) {
         let assignmentID = assignmentObj.id
             for (learnerInfo of agsubmissions) {
                 if(learnerInfo.assignment_id == assignmentID) {
+                    // Deduct 10 points from all asignments turned in late; compare AssignmentInfo "due_at" to LearnerSubmission "submitted_at"
+                    // Remove assignments not due yet.
+                  if(assignmentObj.points_possible <= 0){
+                    try {
+                      throw "Assignment points cannot be 0 or less"
+                    } catch (error) {
+                      console.log("Error: " + error)
+                    }
+                  }
+                  if(wasSubmittedLate(learnerInfo.submission.submitted_at, assignmentObj.due_at) == true){
                     learnerUpdatedData.unshift(
-                        {
-                            learner_id: learnerInfo.learner_id,
-                            assignment_id: assignmentID,
-                            submission: {
-                                was_submited_late: wasSubmittedLate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
-                                final_score: [learnerInfo.submission.score,assignmentObj.points_possible]
-                            }
-                        }
-                    )
+                      {
+                          learner_id: learnerInfo.learner_id,
+                          assignment_id: assignmentID,
+                          submission: {
+                              was_submited_late: wasSubmittedLate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
+                              final_score: [(learnerInfo.submission.score - 10), assignmentObj.points_possible, (learnerInfo.submission.score - 10) /assignmentObj.points_possible]
+                          }
+                      }
+                  )
+                  } else {
+                    learnerUpdatedData.unshift(
+                      {
+                          learner_id: learnerInfo.learner_id,
+                          assignment_id: assignmentID,
+                          submission: {
+                              was_submited_late: wasSubmittedLate(learnerInfo.submission.submitted_at, assignmentObj.due_at),
+                              final_score: [learnerInfo.submission.score, assignmentObj.points_possible, learnerInfo.submission.score/assignmentObj.points_possible]
+                          }
+                      }
+                  )
+                  }
                 }
             }
         }
-        console.log(learnerUpdatedData)
     return learnerUpdatedData
   }
+
+  function processLearnerData(learnerArray){
+    //Make the final learner objects inside an array. Filters data to match the result example.
+    let finalArray = []
+    for (submissionInfo of learnerArray){
+      if(finalArray.length == 0){
+        if(submissionInfo.submission.was_submited_late != "Not due yet."){
+          finalArray.push({
+            learner_id : submissionInfo.learner_id,
+            [submissionInfo.assignment_id]: submissionInfo.submission.final_score[2],
+         })
+        } else {
+          finalArray.push({
+            learner_id : submissionInfo.learner_id
+         })
+        }
+        } else {
+          for(item of finalArray) {
+            // // if an assignment is not yet due, it should not be included in either
+            // // the average or the keyed dictionary of scores
+            // Calculate the avg, trawl through the assignments and grab their grades + total points
+            // Calculate the percentage total of each assignment, by their ID.
+            if(item.learner_id == submissionInfo.learner_id && submissionInfo.submission.was_submited_late != "Not due yet.") {
+              item[submissionInfo.assignment_id] = submissionInfo.submission.final_score[2]
+              break
+            } else if (finalArray.findIndex(data => data.learner_id == submissionInfo.learner_id) == -1) {
+              finalArray.push({
+                learner_id : submissionInfo.learner_id,
+                [submissionInfo.assignment_id]: submissionInfo.submission.final_score[2],
+            })
+          }
+        }
+      }
+    }
+    return finalArray
+  }
+
+  function processScoreAverage(learnerArray){
+    //Process the overall average grade
+    for (learnerData of learnerArray){
+      learnerData.avg = learnerData[1]/learnerData[2]
+    }
+
+    return learnerArray
+  }
+
 
   function getLearnerData(course, ag, submissions) {
         // If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
@@ -141,48 +210,9 @@ const CourseInfo = {
         console.log("Error: " + error)
     }
 
-    collectLearnerSubmissions(ag,submissions)
+    let learnerConvertedData = processLearnerData(collectLearnerSubmissions(ag,submissions))
+    return processScoreAverage(learnerConvertedData)
 
-    // // the ID of the learner for which this data has been collected
-    // "id": number,
-    // // the learner’s total, weighted average, in which assignments
-    // // with more points_possible should be counted for more
-    // // e.g. a learner with 50/100 on one assignment and 190/200 on another
-    // // would have a weighted average score of 240/300 = 80%.
-    // "avg": number,
-    // // each assignment should have a key with its ID,
-    // // and the value associated with it should be the percentage that
-    // // the learner scored on the assignment (submission.score / points_possible)
-    // <assignment_id>: number,
-    // // if an assignment is not yet due, it should not be included in either
-    // // the average or the keyed dictionary of scores
-
-
-  
-
-    // Deduct 10 points from all asignments turned in late; compare AssignmentInfo "due_at" to LearnerSubmission "submitted_at"
-    // Calculate the avg, trawl through the assignments and grab their grades + total points
-    // Calculate the percentage total of each assignment, by their ID.
-    // Wrap all of this up in an object.
-    // Final object does not need to match the order of the example
-    // Okay to use round() or something to clean up decimals
-
-    const result = [
-      {
-        id: 125,
-        avg: 0.985, // (47 + 150) / (50 + 150)
-        1: 0.94, // 47 / 50
-        2: 1.0 // 150 / 150
-      },
-      {
-        id: 132,
-        avg: 0.82, // (39 + 125) / (50 + 150)
-        1: 0.78, // 39 / 50
-        2: 0.833 // late: (140 - 15) / 150
-      }
-    ];
-  
-    return result;
   }
   
   const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
